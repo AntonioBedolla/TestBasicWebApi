@@ -22,9 +22,9 @@ namespace TestBasicWebApi.Services
         {
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, username), // este el correo o nombre de usuario
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // Aquí guardamos el ID del usuario
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())// Id de token
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // Aquí guardamos el ID del usuario
+                new Claim(JwtRegisteredClaimNames.Sub, username), // este el correo o nombre de usuario
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())// Id de token
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));

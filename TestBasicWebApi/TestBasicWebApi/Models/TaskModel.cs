@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TestBasicWebApi.Models
 {
@@ -24,6 +25,7 @@ namespace TestBasicWebApi.Models
         public int UsuarioId { get; set; }
 
         [ForeignKey("UsuarioId")]
-        public UsuarioModel Usuario { get; set; }
+        [JsonIgnore]
+        public UsuarioModel? Usuario { get; set; }
     }
 }
