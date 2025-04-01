@@ -44,32 +44,34 @@ namespace TestBasicWebApi.Controllers
 
         // ✅ 3. Actualizar un usuario
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, UsuarioModel updatedUser)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UsuarioModel updatedUser)
         {
-            if (id != updatedUser.Id)
-            {
-                return BadRequest(new { message = "Los IDs no coinciden" });
-            }
-
-            _context.Entry(updatedUser).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
+                var user = await _context.Usuarios.FindAsync(id);
+                if (user == null)
                 {
                     return NotFound(new { message = "Usuario no encontrado" });
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+                // Si la contraseña enviada es diferente a la guardada, la encriptamos
+                if (!string.IsNullOrEmpty(updatedUser.Password) && !BCrypt.Net.BCrypt.Verify(updatedUser.Password, user.Password))
+                {
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(updatedUser.Password);
+                }
+
+                user.Nombre = updatedUser.Nombre;
+                user.Email = updatedUser.Email;
+
+                _context.Usuarios.Update(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Usuario actualizado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error interno del servidor", error = ex.Message });
+            }
         }
 
         // ✅ 4. Eliminar un usuario
